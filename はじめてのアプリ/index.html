@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<!-- ↑ おまじない：「これはHTMLファイルです」という宣言 -->
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <!-- ↑ 日本語が文字化けしないための設定 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- ↑ スマホでもちょうどいい大きさで表示する設定 -->
+  <title>たろうのやることリスト</title>
+
+  <!-- ====== ここから CSS（見た目）====== -->
+  <style>
+    /* ページ全体の設定 */
+    body {
+      font-family: "Segoe UI", "メイリオ", sans-serif;
+      background: #f0f4f8;          /* うすい水色の背景 */
+      display: flex;
+      justify-content: center;      /* 中身を横方向の中央へ */
+      padding: 40px 16px;
+      margin: 0;
+    }
+
+    /* 白いカード部分 */
+    .card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);  /* やわらかい影 */
+      padding: 24px;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0 0 4px;
+      color: #1f2d3d;
+    }
+
+    .sub {
+      margin: 0 0 20px;
+      color: #7a8ba0;
+      font-size: 13px;
+    }
+
+    /* 入力欄とボタンを横並びにする箱 */
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    #newItem {
+      flex: 1;                       /* 余った幅いっぱいに広がる */
+      padding: 12px;
+      border: 2px solid #dce4ec;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+    }
+    #newItem:focus { border-color: #ff5b9e; }  /* クリック中は青枠 */
+
+    .add-btn {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 10px;
+      background: #ff5b9e;
+      color: #fff;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .add-btn:hover { background: #e0447f; }
+
+    /* リスト下の帯（残り件数と「完了を消す」ボタン）*/
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+    }
+    .count { color: #7a8ba0; font-size: 13px; }
+    .clear-btn {
+      border: none;
+      background: #f0f4f8;
+      color: #5a6b7d;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .clear-btn:hover { background: #e2e8f0; }
+
+    /* リスト全体 */
+    ul {
+      list-style: none;              /* 「・」の点を消す */
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #f7f9fc;
+      margin-bottom: 8px;
+    }
+
+    li .text { flex: 1; font-size: 15px; color: #2d3a4a; }
+
+    /* 「完了」にしたときの見た目 */
+    li.done .text {
+      text-decoration: line-through;  /* 取り消し線 */
+      color: #a0adbb;
+    }
+
+    li input[type="checkbox"] {
+      width: 20px; height: 20px; cursor: pointer;
+    }
+
+    .del-btn {
+      border: none;
+      background: transparent;
+      color: #ff6b6b;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .empty {
+      text-align: center;
+      color: #b5c0cd;
+      padding: 20px 0;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ====== ここから HTML（中身・骨組み）====== -->
+  <div class="card">
+    <h1>📝 たろうのやることリスト</h1>
+    <p class="sub">やることを書いて「追加」を押してみましょう</p>
+
+    <div class="input-row">
+      <!-- 文字を打ち込む欄 -->
+      <input id="newItem" type="text" placeholder="例：牛乳を買う">
+      <!-- 追加ボタン。押すと下の addItem() が動く -->
+      <button class="add-btn" onclick="addItem()">追加</button>
+    </div>
+
+    <!-- ここに項目が並んでいく（最初はからっぽ） -->
+    <ul id="list"></ul>
+
+    <!-- リストの下：残り件数と「完了を消す」ボタン -->
+    <div class="footer">
+      <span id="count" class="count">残り 0 件</span>
+      <button class="clear-btn" onclick="clearDone()">完了を消す</button>
+    </div>
+  </div>
+
+  <!-- ====== ここから JavaScript（うごき）====== -->
+  <script>
+    // やることを覚えておく箱（配列）。1つ1つは { text: 文字, done: 完了かどうか }
+    let todos = [];
+
+    // ▼ ブラウザに保存しておいて、次に開いても消えないようにする
+    function save() {
+      localStorage.setItem("myTodos", JSON.stringify(todos));
+    }
+
+    // ▼ 保存してあったデータを読み込む
+    function load() {
+      const saved = localStorage.getItem("myTodos");
+      if (saved) todos = JSON.parse(saved);
+    }
+
+    // ▼ 画面に今のリストを描き直す
+    function render() {
+      const list = document.getElementById("list");
+      list.innerHTML = ""; // いったん空にする
+
+      // 残り（まだ終わっていない）件数を数えて表示する
+      const remaining = todos.filter(function (t) { return !t.done; }).length;
+      document.getElementById("count").textContent = "残り " + remaining + " 件";
+
+      if (todos.length === 0) {
+        list.innerHTML = '<p class="empty">まだ何もありません</p>';
+        return;
+      }
+
+      // todos の中身を1つずつ取り出して行を作る
+      todos.forEach(function (todo, index) {
+        const li = document.createElement("li");
+        if (todo.done) li.classList.add("done");
+
+        li.innerHTML =
+          '<input type="checkbox" ' + (todo.done ? "checked" : "") +
+          ' onclick="toggle(' + index + ')">' +
+          '<span class="text"></span>' +
+          '<button class="del-btn" onclick="remove(' + index + ')">🗑</button>';
+
+        // 文字はあえて textContent で入れる（打ち込んだ文字を安全に表示するため）
+        li.querySelector(".text").textContent = todo.text;
+        list.appendChild(li);
+      });
+    }
+
+    // ▼ 「追加」ボタンを押したときの動き
+    function addItem() {
+      const input = document.getElementById("newItem");
+      const text = input.value.trim(); // 前後の空白を消す
+      if (text === "") return;         // 空っぽなら何もしない
+
+      todos.push({ text: text, done: false }); // 箱に追加
+      input.value = "";                          // 入力欄を空に戻す
+      save();
+      render();
+    }
+
+    // ▼ チェックのON/OFFを切り替える
+    function toggle(index) {
+      todos[index].done = !todos[index].done;
+      save();
+      render();
+    }
+
+    // ▼ ゴミ箱ボタンで削除する
+    function remove(index) {
+      todos.splice(index, 1); // index番目を1個消す
+      save();
+      render();
+    }
+
+    // ▼ 「完了を消す」ボタン：チェック済みのものだけまとめて消す
+    function clearDone() {
+      todos = todos.filter(function (t) { return !t.done; });
+      save();
+      render();
+    }
+
+    // ▼ Enterキーでも追加できるようにする
+    document.getElementById("newItem").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") addItem();
+    });
+
+    // ▼ ページを開いたとき：保存データを読んで表示
+    load();
+    render();
+  </script>
+</body>
+</html>
