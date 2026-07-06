@@ -6,20 +6,20 @@
   <!-- ↑ 日本語が文字化けしないための設定 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- ↑ スマホでもちょうどいい大きさで表示する設定 -->
-  <title>たろうのやることリスト</title>
-
+  <title>あなたの会社分析リスト</title>
+H
   <!-- ====== ここから CSS（見た目）====== -->
   <style>
     /* ページ全体の設定 */
-    body {
+    body {H
       font-family: "Segoe UI", "メイリオ", sans-serif;
-      background: #f0f4f8;          /* うすい水色の背景 */
+      background: #eef7f0;          /* うすい水色の背景 */
       display: flex;
       justify-content: center;      /* 中身を横方向の中央へ */
       padding: 40px 16px;
-      margin: 0;
+      margin: 0;くくくくくくくくくくくくくくHHH
     }
-
+く
     /* 白いカード部分 */
     .card {
       background: #ffffff;
@@ -57,13 +57,13 @@
       font-size: 15px;
       outline: none;
     }
-    #newItem:focus { border-color: #ff5b9e; }  /* クリック中は青枠 */
+    #newItem:focus { border-color: #ef4444; }  /* クリック中は青枠 */
 
     .add-btn {
       padding: 12px 18px;
       border: none;
       border-radius: 10px;
-      background: #ff5b9e;
+      background: #ef4444;
       color: #fff;
       font-size: 15px;
       cursor: pointer;
@@ -80,7 +80,7 @@
     .count { color: #7a8ba0; font-size: 13px; }
     .clear-btn {
       border: none;
-      background: #f0f4f8;
+      background: #eef7f0;
       color: #5a6b7d;
       padding: 8px 12px;
       border-radius: 8px;
@@ -88,6 +88,26 @@
       cursor: pointer;
     }
     .clear-btn:hover { background: #e2e8f0; }
+
+    /* 表示切り替えボタン（すべて / 未完了 / 完了）*/
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .filter-btn {
+      border: none;
+      background: #eef7f0;
+      color: #5a6b7d;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .filter-btn.active {
+      background: #ef4444;   /* 今選んでいるボタンはピンク */
+      color: #fff;
+    }
 
     /* リスト全体 */
     ul {
@@ -118,6 +138,42 @@
       width: 20px; height: 20px; cursor: pointer;
     }
 
+    .star-btn {
+      border: none;
+      background: transparent;
+      color: #f5b301;   /* 金色 */
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    /* 重要マークがついた項目の見た目：うすい金色＋左に金色の帯 */
+    li.important {
+      background: #fff8e6;
+      border-left: 4px solid #f5b301;
+    }
+
+    .edit-btn {
+      border: none;
+      background: transparent;
+      color: #7a8ba0;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* 📷 画像の添付ボタンとサムネイル（縮小画像）*/
+    .img-btn {
+      border: none;
+      background: transparent;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .thumb {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;   /* はみ出さずにきれいに収める */
+      border-radius: 8px;
+    }
+
     .del-btn {
       border: none;
       background: transparent;
@@ -138,7 +194,7 @@
 <body>
   <!-- ====== ここから HTML（中身・骨組み）====== -->
   <div class="card">
-    <h1>📝 たろうのやることリスト</h1>
+    <h1>📝 あなたの会社分析リスト</h1>
     <p class="sub">やることを書いて「追加」を押してみましょう</p>
 
     <div class="input-row">
@@ -146,6 +202,13 @@
       <input id="newItem" type="text" placeholder="例：牛乳を買う">
       <!-- 追加ボタン。押すと下の addItem() が動く -->
       <button class="add-btn" onclick="addItem()">追加</button>
+    </div>
+
+    <!-- 表示の切り替えボタン -->
+    <div class="filters">
+      <button class="filter-btn" id="f-all" onclick="setFilter('all')">すべて</button>
+      <button class="filter-btn" id="f-active" onclick="setFilter('active')">未完了</button>
+      <button class="filter-btn" id="f-done" onclick="setFilter('done')">完了</button>
     </div>
 
     <!-- ここに項目が並んでいく（最初はからっぽ） -->
@@ -156,12 +219,21 @@
       <span id="count" class="count">残り 0 件</span>
       <button class="clear-btn" onclick="clearDone()">完了を消す</button>
     </div>
+
+    <!-- 写真を選ぶための部品（画面には出さず、📷ボタンから呼び出す）-->
+    <input type="file" id="imgInput" accept="image/*" style="display:none">
   </div>
 
   <!-- ====== ここから JavaScript（うごき）====== -->
   <script>
     // やることを覚えておく箱（配列）。1つ1つは { text: 文字, done: 完了かどうか }
     let todos = [];
+
+    // 今どの表示にするか（"all"=すべて / "active"=未完了 / "done"=完了）
+    let filter = "all";
+
+    // 📷 今どの項目に写真をつけようとしているか、を覚えておく箱
+    let pendingImageIndex = null;
 
     // ▼ ブラウザに保存しておいて、次に開いても消えないようにする
     function save() {
@@ -179,9 +251,19 @@
       const list = document.getElementById("list");
       list.innerHTML = ""; // いったん空にする
 
+      // 重要マーク（⭐）がついた項目を、上のほうに並べ替える
+      todos.sort(function (a, b) {
+        return (b.important ? 1 : 0) - (a.important ? 1 : 0);
+      });
+
       // 残り（まだ終わっていない）件数を数えて表示する
       const remaining = todos.filter(function (t) { return !t.done; }).length;
       document.getElementById("count").textContent = "残り " + remaining + " 件";
+
+      // 今選ばれている表示ボタンをピンク（active）にする
+      document.getElementById("f-all").classList.toggle("active", filter === "all");
+      document.getElementById("f-active").classList.toggle("active", filter === "active");
+      document.getElementById("f-done").classList.toggle("active", filter === "done");
 
       if (todos.length === 0) {
         list.innerHTML = '<p class="empty">まだ何もありません</p>';
@@ -190,20 +272,76 @@
 
       // todos の中身を1つずつ取り出して行を作る
       todos.forEach(function (todo, index) {
+        // 表示切り替え：選んだ条件に合わないものはとばす
+        if (filter === "active" && todo.done) return;   // 未完了だけ表示中 → 完了はとばす
+        if (filter === "done" && !todo.done) return;    // 完了だけ表示中 → 未完了はとばす
+
         const li = document.createElement("li");
         if (todo.done) li.classList.add("done");
+        if (todo.important) li.classList.add("important");
 
         li.innerHTML =
           '<input type="checkbox" ' + (todo.done ? "checked" : "") +
           ' onclick="toggle(' + index + ')">' +
+          '<button class="star-btn" onclick="toggleStar(' + index + ')">' +
+          (todo.important ? "⭐" : "☆") + '</button>' +
+          (todo.image ? '<img class="thumb" src="' + todo.image + '">' : '') +
           '<span class="text"></span>' +
+          '<button class="img-btn" onclick="attachImage(' + index + ')">📷</button>' +
+          '<button class="edit-btn" onclick="editItem(' + index + ')">✏️</button>' +
           '<button class="del-btn" onclick="remove(' + index + ')">🗑</button>';
 
         // 文字はあえて textContent で入れる（打ち込んだ文字を安全に表示するため）
         li.querySelector(".text").textContent = todo.text;
         list.appendChild(li);
       });
+
+      // 絞り込んだ結果、表示するものが1つもなかったとき
+      if (list.children.length === 0) {
+        list.innerHTML = '<p class="empty">表示するものがありません</p>';
+      }
     }
+
+    // ▼ 表示の切り替え（すべて / 未完了 / 完了）
+    function setFilter(name) {
+      filter = name;
+      render();
+    }
+
+    // ▼ 📷 ボタン：どの項目に写真をつけるか覚えて、ファイル選択を開く
+    function attachImage(index) {
+      pendingImageIndex = index;
+      document.getElementById("imgInput").click();
+    }
+
+    // ▼ 写真が選ばれたときの動き（小さく縮小してから保存する）
+    document.getElementById("imgInput").addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (!file || pendingImageIndex === null) return;
+
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        const img = new Image();
+        img.onload = function () {
+          // 横幅を最大400pxまで縮小する（容量を小さく保つため）
+          const maxW = 400;
+          const scale = Math.min(1, maxW / img.width);
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+          canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          // 縮小した画像を、その項目に保存
+          todos[pendingImageIndex].image = canvas.toDataURL("image/jpeg", 0.7);
+          pendingImageIndex = null;
+          e.target.value = ""; // 同じ写真をもう一度選べるようにリセット
+          save();
+          render();
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
 
     // ▼ 「追加」ボタンを押したときの動き
     function addItem() {
@@ -211,7 +349,7 @@
       const text = input.value.trim(); // 前後の空白を消す
       if (text === "") return;         // 空っぽなら何もしない
 
-      todos.push({ text: text, done: false }); // 箱に追加
+      todos.push({ text: text, done: false, important: false }); // 箱に追加
       input.value = "";                          // 入力欄を空に戻す
       save();
       render();
@@ -220,6 +358,25 @@
     // ▼ チェックのON/OFFを切り替える
     function toggle(index) {
       todos[index].done = !todos[index].done;
+      save();
+      render();
+    }
+
+    // ▼ ⭐ ボタン：重要マークのオン/オフを切り替える
+    function toggleStar(index) {
+      todos[index].important = !todos[index].important;
+      save();
+      render();
+    }
+
+    // ▼ ✏️ ボタン：項目の文字をあとから書き直す
+    function editItem(index) {
+      // 小さな入力窓を出す。今の文字を最初から入れておく
+      const newText = prompt("新しい内容を入力してください", todos[index].text);
+      if (newText === null) return;   // 「キャンセル」を押したら何もしない
+      const trimmed = newText.trim();
+      if (trimmed === "") return;      // 空っぽのときは変更しない
+      todos[index].text = trimmed;     // 中身を書き換える
       save();
       render();
     }
