@@ -32,7 +32,7 @@ body {
 .container {
   max-width: 520px;
   margin: 0 auto;
-  padding: 64px 20px 80px;
+  padding: 48px 20px 110px;
 }
 
 .header {
@@ -202,4 +202,158 @@ body {
   text-align: center;
   font-size: 13px;
   color: var(--muted);
+}
+
+/* ===== チェックリストの下部 ===== */
+.checklist-footer {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.checklist-footer .footer {
+  margin-top: 0;
+}
+
+.reset-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.reset-btn:hover {
+  color: var(--text);
+  background: #f4f5f7;
+}
+
+/* ===== 2ページ目：写真 ===== */
+.section-lead {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.photo-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 20px;
+  border: 2px dashed var(--border);
+  border-radius: 14px;
+  color: var(--muted);
+  font-size: 15px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: center;
+}
+
+.photo-drop:hover {
+  border-color: var(--accent);
+  background: #fafbff;
+}
+
+.photo-icon {
+  font-size: 40px;
+}
+
+.photo-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.photo-image {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  display: block;
+}
+
+.photo-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.add-btn.secondary {
+  background: #eef0f5;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  line-height: 40px;
+  padding: 0 20px;
+}
+
+.add-btn.secondary:hover {
+  background: #e2e5ee;
+}
+
+.analyze-btn {
+  height: 46px;
+  width: 100%;
+}
+
+/* ===== 下部のタブバー ===== */
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -6px 20px rgba(31, 41, 51, 0.06);
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  z-index: 10;
+}
+
+.tabbtn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--muted);
+  font-family: inherit;
+  transition: color 0.15s, background 0.15s;
+}
+
+.tabbtn:hover {
+  background: #f4f5f7;
+}
+
+.tabbtn.active {
+  color: var(--accent);
+  background: rgba(79, 70, 229, 0.08);
+}
+
+.tabbtn-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.tabbtn-label {
+  font-size: 12px;
+  font-weight: 500;
 }
