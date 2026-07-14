@@ -4,18 +4,18 @@ import { useState } from "react";
 import Checklist from "./Checklist";
 import PhotoAnalyze from "./PhotoAnalyze";
 
-// ▼ 1ページ目：取引前チェック（サンプル。あとで本物に差しかえOK）
+// ▼ 1ページ目：取引前チェック
 const PAGE1_ITEMS = [
-  "会社名・所在地を確認した",
-  "登記情報（会社の登録内容）を確認した",
-  "代表者の氏名を確認した",
-  "事業の内容を確認した",
-  "設立年・営業年数を確認した",
-  "取引の目的を確認した",
-  "決算書を入手した",
-  "希望する取引金額を確認した",
-  "支払い条件を確認した",
-  "反社会的勢力でないか確認した",
+  "公序良俗に違反する業種ではない",
+  "許可が必要な業種の場合、許可がある",
+  "過去に自己破産・代位弁済がない",
+  "配偶者・親戚に、類似業種での事故歴がない",
+  "住宅ローン・個人借り入れの返済に乱れがない",
+  "事務所を自社で所有、または賃貸契約している",
+  "今回の資金の使いみちは事業性である",
+  "帳簿・決算に変造・粉飾がない",
+  "電気・ガス・水道代の延滞がない",
+  "悪質な紹介者に多大な手数料を支払っていない",
 ];
 
 // ▼ 3ページ目：与信判断チェック（サンプル。あとで本物に差しかえOK）
@@ -52,7 +52,7 @@ export default function AppTabs() {
 
       <div className="tab-content">
         {tab === 1 && (
-          <Checklist storageKey="app:check-page1" defaultItems={PAGE1_ITEMS} />
+          <Checklist storageKey="app:check-page1-v2" defaultItems={PAGE1_ITEMS} />
         )}
         {tab === 2 && <PhotoAnalyze />}
         {tab === 3 && (
