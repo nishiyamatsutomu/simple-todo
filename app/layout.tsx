@@ -10,8 +10,8 @@ const notoSansJP = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "シンプル TODO",
-  description: "タスクの追加・完了・削除ができるシンプルなTODOアプリ",
+  title: "企業チェック & 与信判断アプリ",
+  description: "取引前チェック・決算書の撮影分析・与信判断ができるアプリ",
 };
 
 export default function RootLayout({
