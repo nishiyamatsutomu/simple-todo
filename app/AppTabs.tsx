@@ -36,24 +36,42 @@ type Tab = 1 | 2 | 3;
 
 const APP_TITLE = "あなたの会社分析";
 
-const TITLES: Record<Tab, { title: string; subtitle: string }> = {
+const TITLES: Record<
+  Tab,
+  { title: string; subtitle: string; note?: string[] }
+> = {
   1: {
     title: "① 申込前チェック",
     subtitle: "次の10項目に当てはまればチェックをいれて下さい",
   },
-  2: { title: "② 決算書 撮影・分析", subtitle: "決算書を撮って企業を分析" },
+  2: {
+    title: "② 決算書 撮影・分析",
+    subtitle: "決算書を撮って企業を分析",
+    note: [
+      "1つでもチェックがない場合は改善してください",
+      "金融公庫や保証付き融資の与信判断に影響する場合があります",
+    ],
+  },
   3: { title: "③ 与信判断チェック", subtitle: "取引してよいかの最終判断" },
 };
 
 export default function AppTabs() {
   const [tab, setTab] = useState<Tab>(1);
+  const { title, subtitle, note } = TITLES[tab];
 
   return (
     <>
       <header className="header">
         <p className="app-title">{APP_TITLE}</p>
-        <h1 className="title">{TITLES[tab].title}</h1>
-        <p className="subtitle">{TITLES[tab].subtitle}</p>
+        {note && (
+          <div className="header-note">
+            {note.map((line, i) => (
+              <p key={i}>{line}</p>
+            ))}
+          </div>
+        )}
+        <h1 className="title">{title}</h1>
+        <p className="subtitle">{subtitle}</p>
       </header>
 
       <div className="tab-content">
