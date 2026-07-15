@@ -44,6 +44,14 @@ body {
   margin-bottom: 32px;
 }
 
+.app-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+
 .title {
   font-size: 28px;
   font-weight: 700;
@@ -206,6 +214,72 @@ body {
   text-align: center;
   font-size: 13px;
   color: var(--muted);
+}
+
+/* ===== 判定ボタン・判定結果 ===== */
+.judge-btn {
+  width: 100%;
+  margin-top: 20px;
+  padding: 15px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.05s;
+}
+
+.judge-btn:hover {
+  background: var(--accent-hover);
+}
+
+.judge-btn:active {
+  transform: scale(0.99);
+}
+
+.judge-result {
+  margin-top: 16px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.judge-result.ok {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+
+.judge-result.warn {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.judge-headline {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.judge-detail {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.judge-missing {
+  margin-top: 12px;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.judge-missing li {
+  list-style: disc;
 }
 
 /* ===== チェックリストの下部 ===== */

@@ -34,8 +34,13 @@ const CREDIT_ITEMS = [
 
 type Tab = 1 | 2 | 3;
 
+const APP_TITLE = "あなたの会社分析";
+
 const TITLES: Record<Tab, { title: string; subtitle: string }> = {
-  1: { title: "① 取引前チェック", subtitle: "取引をはじめる前の基本の確認" },
+  1: {
+    title: "① 申込前チェック",
+    subtitle: "次の10項目に当てはまればチェックをいれて下さい",
+  },
   2: { title: "② 決算書 撮影・分析", subtitle: "決算書を撮って企業を分析" },
   3: { title: "③ 与信判断チェック", subtitle: "取引してよいかの最終判断" },
 };
@@ -46,6 +51,7 @@ export default function AppTabs() {
   return (
     <>
       <header className="header">
+        <p className="app-title">{APP_TITLE}</p>
         <h1 className="title">{TITLES[tab].title}</h1>
         <p className="subtitle">{TITLES[tab].subtitle}</p>
       </header>
@@ -66,7 +72,7 @@ export default function AppTabs() {
           onClick={() => setTab(1)}
         >
           <span className="tabbtn-icon">✅</span>
-          <span className="tabbtn-label">取引前</span>
+          <span className="tabbtn-label">申込前</span>
         </button>
         <button
           className={`tabbtn${tab === 2 ? " active" : ""}`}
