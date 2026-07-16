@@ -404,6 +404,88 @@ body {
   width: 100%;
 }
 
+/* ===== 2ページ目：数字の入力欄 ===== */
+.finput-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.finput-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.finput-label {
+  font-size: 15px;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.finput-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.finput-input {
+  flex: 1;
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 16px;
+  font-family: inherit;
+  text-align: right;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.finput-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+.finput-unit {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.yesno-box {
+  display: flex;
+  gap: 10px;
+}
+
+.yesno-btn {
+  flex: 1;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--text);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.yesno-btn:hover {
+  background: #f4f5f7;
+}
+
+.yesno-btn.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* 2ページ目のカードを縦に並べる */
+.tab-content .card + .card {
+  margin-top: 18px;
+}
+
 /* ===== 下部のタブバー ===== */
 .tabbar {
   position: fixed;

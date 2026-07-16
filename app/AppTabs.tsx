@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Checklist from "./Checklist";
 import PhotoAnalyze from "./PhotoAnalyze";
+import FinancialInputs from "./FinancialInputs";
 
 // ▼ 1ページ目：取引前チェック
 const PAGE1_ITEMS = [
@@ -88,7 +89,12 @@ export default function AppTabs() {
         {tab === 1 && (
           <Checklist storageKey="app:check-page1-v2" defaultItems={PAGE1_ITEMS} />
         )}
-        {tab === 2 && <PhotoAnalyze />}
+        {tab === 2 && (
+          <>
+            <PhotoAnalyze />
+            <FinancialInputs />
+          </>
+        )}
         {tab === 3 && (
           <Checklist storageKey="app:check-credit" defaultItems={CREDIT_ITEMS} />
         )}
