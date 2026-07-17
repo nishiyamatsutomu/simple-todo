@@ -5,9 +5,14 @@ import { useEffect, useState } from "react";
 type Props = {
   storageKey: string;
   defaultItems: string[];
+  showJudge?: boolean;
 };
 
-export default function Checklist({ storageKey, defaultItems }: Props) {
+export default function Checklist({
+  storageKey,
+  defaultItems,
+  showJudge = true,
+}: Props) {
   const [checked, setChecked] = useState<boolean[]>(() =>
     defaultItems.map(() => false)
   );
@@ -68,11 +73,13 @@ export default function Checklist({ storageKey, defaultItems }: Props) {
         ))}
       </ul>
 
-      <button className="judge-btn" onClick={() => setJudged(true)}>
-        判定する
-      </button>
+      {showJudge && (
+        <button className="judge-btn" onClick={() => setJudged(true)}>
+          判定する
+        </button>
+      )}
 
-      {judged && (
+      {showJudge && judged && (
         <div className={`judge-result${allChecked ? " ok" : " warn"}`}>
           <p className="judge-headline">
             {allChecked ? "✅ 判定：OK" : "⚠️ 判定：改善してください"}

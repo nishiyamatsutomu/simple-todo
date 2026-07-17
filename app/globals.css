@@ -524,6 +524,64 @@ body {
   transform: scale(0.99);
 }
 
+/* ===== 3ページ目：比率分析の入力 ===== */
+.ratio-group {
+  margin-bottom: 20px;
+}
+
+.ratio-cat {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ratio-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ratio-formula {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.ratio-score-box {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.ratio-score {
+  width: 72px;
+  padding: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  text-align: right;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.ratio-formula:focus,
+.ratio-score:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
 /* ===== 下部のタブバー ===== */
 .tabbar {
   position: fixed;

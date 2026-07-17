@@ -4,6 +4,7 @@ import { useState } from "react";
 import Checklist from "./Checklist";
 import PhotoAnalyze from "./PhotoAnalyze";
 import FinancialInputs from "./FinancialInputs";
+import CreditRatios from "./CreditRatios";
 
 // ▼ 1ページ目：取引前チェック
 const PAGE1_ITEMS = [
@@ -17,20 +18,6 @@ const PAGE1_ITEMS = [
   "帳簿・決算に変造・粉飾がない",
   "電気・ガス・水道代の延滞がない",
   "悪質な紹介者に多大な手数料を支払っていない",
-];
-
-// ▼ 3ページ目：与信判断チェック（サンプル。あとで本物に差しかえOK）
-const CREDIT_ITEMS = [
-  "売上は安定して伸びているか",
-  "利益（黒字）が出ているか",
-  "自己資本比率は十分か",
-  "借入が多すぎないか",
-  "現金・預金は十分にあるか",
-  "支払い遅れの情報はないか",
-  "取引限度額を決めたか",
-  "担保・保証はあるか",
-  "業界全体の景気は悪くないか",
-  "総合的に取引してよいと判断できるか",
 ];
 
 type Tab = 1 | 2 | 3;
@@ -106,9 +93,7 @@ export default function AppTabs() {
             </button>
           </>
         )}
-        {tab === 3 && (
-          <Checklist storageKey="app:check-credit" defaultItems={CREDIT_ITEMS} />
-        )}
+        {tab === 3 && <CreditRatios />}
       </div>
 
       <nav className="tabbar">
