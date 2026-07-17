@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 const CATEGORIES = ["安定性", "収益性", "生産性"];
 const ROWS_PER_CATEGORY = 2;
-const STORAGE_KEY = "app:credit-ratios-v5";
+const STORAGE_KEY = "app:credit-ratios-v7";
 
 type Row = { formula: string; score: string };
 
@@ -15,10 +15,12 @@ function emptyData(): Row[][] {
   // 収益性（2番目）の項目に、あらかじめ文を入れておく
   data[1][0].formula = "業種を問わず売上総利益から判定";
   data[1][1].formula = "M＆Aでも使われる経常利益/自己資本比率";
-  // 安定性（1番目）の2項目目
+  // 安定性（1番目）
+  data[0][0].formula = "今までの積み重ね自己資本比率";
   data[0][1].formula = "売上不振・不況になっても耐えうる余力";
-  // 生産性（3番目）の1項目目
+  // 生産性（3番目）
   data[2][0].formula = "従業員1名当たりの貢献度から判定";
+  data[2][1].formula = "再チェック人件費比率";
   return data;
 }
 
