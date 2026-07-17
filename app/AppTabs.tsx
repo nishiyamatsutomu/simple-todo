@@ -5,6 +5,7 @@ import Checklist from "./Checklist";
 import PhotoAnalyze from "./PhotoAnalyze";
 import FinancialInputs from "./FinancialInputs";
 import CreditRatios from "./CreditRatios";
+import ContactForm from "./ContactForm";
 
 // ▼ 1ページ目：取引前チェック
 const PAGE1_ITEMS = [
@@ -82,7 +83,10 @@ export default function AppTabs() {
 
       <div className="tab-content">
         {tab === 1 && (
-          <Checklist storageKey="app:check-page1-v2" defaultItems={PAGE1_ITEMS} />
+          <>
+            <ContactForm />
+            <Checklist storageKey="app:check-page1-v2" defaultItems={PAGE1_ITEMS} />
+          </>
         )}
         {tab === 2 && (
           <>
