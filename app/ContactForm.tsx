@@ -7,14 +7,13 @@ const CONTACT_EMAIL = "nishiyama2106senshou@gmail.com";
 
 export default function ContactForm() {
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
   const send = () => {
     const subject = encodeURIComponent("アプリのお問い合わせ");
     const body = encodeURIComponent(
-      `お名前: ${name || "（未記入）"}\nご返信先メール: ${email}\n\n${message}`
+      `ご返信先メール: ${email}\n\n${message}`
     );
     window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
   };
@@ -30,13 +29,7 @@ export default function ContactForm() {
   return (
     <section className="card contact-panel">
       <p className="contact-title">お問い合わせ</p>
-      <input
-        className="contact-input"
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="お名前（任意）"
-      />
+      <p className="contact-to">宛先（To）：{CONTACT_EMAIL}</p>
       <input
         className="contact-input"
         type="email"

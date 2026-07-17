@@ -552,7 +552,14 @@ body {
 .contact-title {
   font-size: 16px;
   font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.contact-to {
+  font-size: 13px;
+  color: var(--muted);
   margin-bottom: 12px;
+  word-break: break-all;
 }
 
 .contact-input,
