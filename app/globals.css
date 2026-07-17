@@ -406,19 +406,23 @@ body {
 
 /* ===== 2ページ目：数字の入力欄 ===== */
 .finput-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 12px;
 }
 
 .finput-row {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
+}
+
+.finput-full {
+  grid-column: 1 / -1;
 }
 
 .finput-label {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 500;
   word-break: break-word;
 }
@@ -426,14 +430,15 @@ body {
 .finput-box {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .finput-input {
   flex: 1;
   width: 100%;
-  padding: 12px 14px;
-  font-size: 16px;
+  min-width: 0;
+  padding: 9px 10px;
+  font-size: 14px;
   font-family: inherit;
   text-align: right;
   border: 1px solid var(--border);
@@ -448,8 +453,9 @@ body {
 }
 
 .finput-unit {
-  font-size: 14px;
+  font-size: 12px;
   color: var(--muted);
+  white-space: nowrap;
 }
 
 .yesno-box {
@@ -484,6 +490,31 @@ body {
 /* 2ページ目のカードを縦に並べる */
 .tab-content .card + .card {
   margin-top: 18px;
+}
+
+/* 「判定は次のページで」ボタン */
+.next-page-btn {
+  width: 100%;
+  margin-top: 18px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: background 0.15s, transform 0.05s;
+}
+
+.next-page-btn:hover {
+  background: var(--accent-hover);
+}
+
+.next-page-btn:active {
+  transform: scale(0.99);
 }
 
 /* ===== 下部のタブバー ===== */

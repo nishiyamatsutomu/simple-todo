@@ -93,6 +93,9 @@ export default function AppTabs() {
           <>
             <PhotoAnalyze />
             <FinancialInputs />
+            <button className="next-page-btn" onClick={() => setTab(3)}>
+              判定は次のページで →
+            </button>
           </>
         )}
         {tab === 3 && (

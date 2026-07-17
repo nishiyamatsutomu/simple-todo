@@ -8,13 +8,13 @@ type Field =
   | { label: string; type: "yesno" };
 
 const FIELDS: Field[] = [
-  { label: "売上総利益", type: "number", unit: "円" },
-  { label: "経常利益", type: "number", unit: "円" },
-  { label: "人件費（総額）", type: "number", unit: "円" },
-  { label: "販売管理費", type: "number", unit: "円" },
-  { label: "現預金", type: "number", unit: "円" },
-  { label: "自己資本", type: "number", unit: "円" },
-  { label: "総資産", type: "number", unit: "円" },
+  { label: "売上総利益", type: "number", unit: "千円" },
+  { label: "経常利益", type: "number", unit: "千円" },
+  { label: "人件費（総額）", type: "number", unit: "千円" },
+  { label: "販売管理費", type: "number", unit: "千円" },
+  { label: "現預金", type: "number", unit: "千円" },
+  { label: "自己資本", type: "number", unit: "千円" },
+  { label: "総資産", type: "number", unit: "千円" },
   { label: "従業員数", type: "number", unit: "人" },
   { label: "資金繰り表作成", type: "yesno" },
 ];
@@ -64,7 +64,10 @@ export default function FinancialInputs() {
 
       <div className="finput-list">
         {FIELDS.map((field, i) => (
-          <div className="finput-row" key={i}>
+          <div
+            className={`finput-row${field.type === "yesno" ? " finput-full" : ""}`}
+            key={i}
+          >
             <label className="finput-label" htmlFor={`finput-${i}`}>
               {field.label}
             </label>
