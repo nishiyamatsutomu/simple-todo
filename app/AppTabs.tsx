@@ -39,7 +39,7 @@ const APP_TITLE = "あなたの会社分析";
 
 const TITLES: Record<
   Tab,
-  { title: string; subtitle?: string[]; note?: string[] }
+  { title: string; lead?: string; subtitle?: string[]; note?: string[] }
 > = {
   1: {
     title: "① 申込前チェック",
@@ -57,12 +57,19 @@ const TITLES: Record<
       "会社名や取引先がわかるものは消してください",
     ],
   },
-  3: { title: "③ 与信判断チェック", subtitle: ["取引してよいかの最終判断"] },
+  3: {
+    title: "③ 与信判断チェック",
+    lead: "比率分析からの判断",
+    subtitle: [
+      "企業の安定性・収益性・生産性についての与信判断です。",
+      "業種・業界の成長性については加味していません。",
+    ],
+  },
 };
 
 export default function AppTabs() {
   const [tab, setTab] = useState<Tab>(1);
-  const { title, subtitle, note } = TITLES[tab];
+  const { title, lead, subtitle, note } = TITLES[tab];
 
   return (
     <>
@@ -76,6 +83,7 @@ export default function AppTabs() {
           </div>
         )}
         <h1 className="title">{title}</h1>
+        {lead && <p className="page-lead">{lead}</p>}
         {subtitle && (
           <div className="subtitle">
             {subtitle.map((line, i) => (
