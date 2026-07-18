@@ -58,6 +58,13 @@ export default function PhotoAnalyze() {
           </button>
         </div>
       )}
+
+      <div className="photo-hint">
+        <p>
+          ジェミニなどに画像を添付して「財務分析」と入力すれば、分析してもらえます。
+        </p>
+        <p>但し、一般的でポジティブなコメントになります。</p>
+      </div>
     </section>
   );
 }
