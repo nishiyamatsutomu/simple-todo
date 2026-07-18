@@ -10,12 +10,12 @@ type Field =
 const FIELDS: Field[] = [
   { label: "売上総利益", type: "number", unit: "千円" },
   { label: "経常利益", type: "number", unit: "千円" },
-  { label: "人件費（総額）", type: "number", unit: "千円" },
-  { label: "販売管理費", type: "number", unit: "千円" },
+  { label: "人件費（役員報酬・給与・法定福利費・福利厚生費）", type: "number", unit: "千円" },
+  { label: "販売管理費（減価償却費を除く）", type: "number", unit: "千円" },
   { label: "現預金", type: "number", unit: "千円" },
   { label: "自己資本", type: "number", unit: "千円" },
   { label: "総資産", type: "number", unit: "千円" },
-  { label: "従業員数", type: "number", unit: "人" },
+  { label: "従業員数（役員・社員は1、非正規は0.5）", type: "number", unit: "人" },
   { label: "資金繰り表作成", type: "yesno" },
 ];
 
