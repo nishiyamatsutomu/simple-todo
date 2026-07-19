@@ -256,10 +256,16 @@ body {
   line-height: 1.8;
 }
 
-.promo-office {
+.promo-address {
   margin-top: 14px;
   padding-top: 12px;
   border-top: 1px solid #d8d5f5;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.promo-office {
+  margin-top: 4px;
   font-size: 17px;
   font-weight: 700;
 }
