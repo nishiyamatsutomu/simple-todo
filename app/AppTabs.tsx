@@ -95,6 +95,14 @@ export default function AppTabs() {
         {tab === 2 && (
           <>
             <PhotoAnalyze />
+            <section className="card promo-card">
+              <p className="promo-line">相続は信頼</p>
+              <p className="promo-line">経営はコントロール</p>
+              <p className="promo-line">税務・経理はその基礎</p>
+              <p className="promo-office">西山正彦税理士事務所</p>
+              <p className="promo-name">代表　西山正彦</p>
+              <p className="promo-tel">☎0744-48-3727</p>
+            </section>
             <FinancialInputs />
             <button className="next-page-btn" onClick={() => setTab(3)}>
               判定は次のページで →
