@@ -86,6 +86,10 @@ export default function AppTabs() {
           <>
             <ContactForm />
             <Checklist storageKey="app:check-page1-v2" defaultItems={PAGE1_ITEMS} />
+            <div className="page1-footer">
+              <p>文責はクラフトマンシップ(株)</p>
+              <p>次回は資金繰りアプリお楽しみに</p>
+            </div>
           </>
         )}
         {tab === 2 && (
