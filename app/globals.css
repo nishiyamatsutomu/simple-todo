@@ -725,6 +725,49 @@ body {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
+.ratio-total {
+  margin-top: 18px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  background: #f7f6ff;
+}
+
+.ratio-total-label {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.ratio-total-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.ratio-criteria {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border: 2px solid var(--text);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ratio-criteria p {
+  font-size: 17px;
+  font-weight: 700;
+  color: #000;
+}
+
+.ratio-criteria-title {
+  margin-bottom: 2px;
+}
+
 .ratio-formula:focus,
 .ratio-score:focus {
   border-color: var(--accent);
