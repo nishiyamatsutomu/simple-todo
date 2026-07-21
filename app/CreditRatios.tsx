@@ -11,6 +11,10 @@ const CATEGORIES: { name: string; rows: number }[] = [
 ];
 
 const STORAGE_KEY = "app:credit-ratios-v8";
+// 2ページ目の数字入力（自己資本=5、総資産=6）
+const FIN_KEY = "app:financial-inputs-v3";
+const IDX_JIKOSHIHON = 5;
+const IDX_SOSHISAN = 6;
 
 type Row = { formula: string; score: string };
 
@@ -32,9 +36,14 @@ function emptyData(): Row[][] {
   return data;
 }
 
+// 安定性1項目め（自動計算するセル）
+const AUTO_CI = 0;
+const AUTO_RI = 0;
+
 export default function CreditRatios() {
   const [data, setData] = useState<Row[][]>(emptyData);
   const [loaded, setLoaded] = useState(false);
+  const [fin, setFin] = useState<string[]>([]);
 
   // 初回に localStorage から読み込む
   useEffect(() => {
@@ -55,8 +64,53 @@ export default function CreditRatios() {
     } catch {
       // 破損データは無視
     }
+    // 2ページ目の数字も読み込む
+    try {
+      const s = localStorage.getItem(FIN_KEY);
+      if (s) {
+        const a = JSON.parse(s);
+        if (Array.isArray(a)) setFin(a);
+      }
+    } catch {
+      // 無視
+    }
     setLoaded(true);
   }, []);
+
+  // 自己資本比率＝自己資本 ÷ 総資産 × 100
+  const jiko = parseFloat(fin[IDX_JIKOSHIHON] ?? "");
+  const so = parseFloat(fin[IDX_SOSHISAN] ?? "");
+  const jikoRatio =
+    Number.isFinite(jiko) && Number.isFinite(so) && so !== 0
+      ? (jiko / so) * 100
+      : null;
+  // 点数ルール：50%以上=15、30%以上=10、10%以上=5、それ未満=0
+  const jikoScore =
+    jikoRatio === null
+      ? null
+      : jikoRatio >= 50
+      ? 15
+      : jikoRatio >= 30
+      ? 10
+      : jikoRatio >= 10
+      ? 5
+      : 0;
+
+  // 計算結果を 安定性1項目めの点数に反映（同じ値なら更新せずループを防ぐ）
+  useEffect(() => {
+    if (!loaded) return;
+    const desired = jikoScore === null ? "" : String(jikoScore);
+    setData((prev) => {
+      if (prev[AUTO_CI][AUTO_RI].score === desired) return prev;
+      return prev.map((rows, i) =>
+        i !== AUTO_CI
+          ? rows
+          : rows.map((row, j) =>
+              j !== AUTO_RI ? row : { ...row, score: desired }
+            )
+      );
+    });
+  }, [loaded, jikoScore]);
 
   // 変更のたびに保存
   useEffect(() => {
@@ -102,28 +156,34 @@ export default function CreditRatios() {
       {CATEGORIES.map((cat, ci) => (
         <div className="ratio-group" key={ci}>
           <h3 className="ratio-cat">{cat.name}</h3>
-          {data[ci].map((row, ri) => (
-            <div className="ratio-row" key={ri}>
-              <input
-                className="ratio-formula"
-                type="text"
-                value={row.formula}
-                onChange={(e) => update(ci, ri, "formula", e.target.value)}
-                placeholder="式"
-              />
-              <div className="ratio-score-box">
-                <input
-                  className="ratio-score"
-                  type="text"
-                  inputMode="numeric"
-                  value={row.score}
-                  onChange={(e) => update(ci, ri, "score", e.target.value)}
-                  placeholder="点数"
-                />
-                <span className="finput-unit">点</span>
+          {data[ci].map((row, ri) => {
+            const isAuto = ci === AUTO_CI && ri === AUTO_RI;
+            return (
+              <div key={ri}>
+                <div className="ratio-row">
+                  <input
+                    className="ratio-formula"
+                    type="text"
+                    value={row.formula}
+                    onChange={(e) => update(ci, ri, "formula", e.target.value)}
+                    placeholder="式"
+                  />
+                  <div className="ratio-score-box">
+                    <input
+                      className="ratio-score"
+                      type="text"
+                      inputMode="numeric"
+                      value={row.score}
+                      onChange={(e) => update(ci, ri, "score", e.target.value)}
+                      placeholder="点数"
+                      readOnly={isAuto}
+                    />
+                    <span className="finput-unit">点</span>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ))}
 
