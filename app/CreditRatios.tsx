@@ -11,10 +11,14 @@ const CATEGORIES: { name: string; rows: number }[] = [
 ];
 
 const STORAGE_KEY = "app:credit-ratios-v8";
-// 2ページ目の数字入力（自己資本=5、総資産=6）
+// 2ページ目の数字入力のならび
 const FIN_KEY = "app:financial-inputs-v3";
-const IDX_JIKOSHIHON = 5;
-const IDX_SOSHISAN = 6;
+const IDX_URIAGE_SORI = 0; // 売上総利益
+const IDX_KEIJO = 1; // 経常利益
+const IDX_HANKANHI = 3; // 販売管理費
+const IDX_GENYOKIN = 4; // 現預金
+const IDX_JIKOSHIHON = 5; // 自己資本
+const IDX_SOSHISAN = 6; // 総資産
 
 type Row = { formula: string; score: string };
 
@@ -36,9 +40,8 @@ function emptyData(): Row[][] {
   return data;
 }
 
-// 安定性1項目め（自動計算するセル）
-const AUTO_CI = 0;
-const AUTO_RI = 0;
+// 自動計算するセル
+const AUTO_CELLS = new Set(["0-0", "0-1", "1-0"]);
 
 export default function CreditRatios() {
   const [data, setData] = useState<Row[][]>(emptyData);
@@ -77,40 +80,86 @@ export default function CreditRatios() {
     setLoaded(true);
   }, []);
 
-  // 自己資本比率＝自己資本 ÷ 総資産 × 100
-  const jiko = parseFloat(fin[IDX_JIKOSHIHON] ?? "");
-  const so = parseFloat(fin[IDX_SOSHISAN] ?? "");
-  const jikoRatio =
-    Number.isFinite(jiko) && Number.isFinite(so) && so !== 0
-      ? (jiko / so) * 100
-      : null;
-  // 点数ルール：50%以上=15、30%以上=10、10%以上=5、それ未満=0
-  const jikoScore =
-    jikoRatio === null
+  const num = (i: number) => {
+    const n = parseFloat(fin[i] ?? "");
+    return Number.isFinite(n) ? n : null;
+  };
+
+  // 安定性1項目め：自己資本 ÷ 総資産 × 100
+  const jiko = num(IDX_JIKOSHIHON);
+  const so = num(IDX_SOSHISAN);
+  const ratio1 = jiko !== null && so !== null && so !== 0 ? (jiko / so) * 100 : null;
+  const score1 =
+    ratio1 === null
       ? null
-      : jikoRatio >= 50
+      : ratio1 >= 50
       ? 15
-      : jikoRatio >= 30
+      : ratio1 >= 30
       ? 10
-      : jikoRatio >= 10
+      : ratio1 >= 10
       ? 5
       : 0;
 
-  // 計算結果を 安定性1項目めの点数に反映（同じ値なら更新せずループを防ぐ）
+  // 安定性2項目め：現預金 ÷ 販管費 × 12
+  const gen = num(IDX_GENYOKIN);
+  const han = num(IDX_HANKANHI);
+  const ratio2 = gen !== null && han !== null && han !== 0 ? (gen / han) * 12 : null;
+  const score2 =
+    ratio2 === null
+      ? null
+      : ratio2 >= 5
+      ? 15
+      : ratio2 >= 3
+      ? 10
+      : ratio2 > 1
+      ? 5
+      : 0;
+
+  // 収益性1項目め：経常利益 ÷ 売上総利益 × 100
+  const keijo = num(IDX_KEIJO);
+  const sori = num(IDX_URIAGE_SORI);
+  const ratio3 =
+    keijo !== null && sori !== null && sori !== 0 ? (keijo / sori) * 100 : null;
+  const score3 =
+    ratio3 === null
+      ? null
+      : ratio3 >= 20
+      ? 15
+      : ratio3 >= 10
+      ? 10
+      : ratio3 >= 0
+      ? 5
+      : 0;
+
+  const autoScores: Record<string, number | null> = {
+    "0-0": score1,
+    "0-1": score2,
+    "1-0": score3,
+  };
+
+  // 計算結果を点数に反映（同じ値なら更新せずループを防ぐ）
   useEffect(() => {
     if (!loaded) return;
-    const desired = jikoScore === null ? "" : String(jikoScore);
     setData((prev) => {
-      if (prev[AUTO_CI][AUTO_RI].score === desired) return prev;
-      return prev.map((rows, i) =>
-        i !== AUTO_CI
-          ? rows
-          : rows.map((row, j) =>
-              j !== AUTO_RI ? row : { ...row, score: desired }
-            )
+      let changed = false;
+      const next = prev.map((rows, i) =>
+        rows.map((row, j) => {
+          const key = `${i}-${j}`;
+          if (key in autoScores) {
+            const sc = autoScores[key];
+            const desired = sc === null ? "" : String(sc);
+            if (row.score !== desired) {
+              changed = true;
+              return { ...row, score: desired };
+            }
+          }
+          return row;
+        })
       );
+      return changed ? next : prev;
     });
-  }, [loaded, jikoScore]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded, score1, score2, score3]);
 
   // 変更のたびに保存
   useEffect(() => {
@@ -157,29 +206,27 @@ export default function CreditRatios() {
         <div className="ratio-group" key={ci}>
           <h3 className="ratio-cat">{cat.name}</h3>
           {data[ci].map((row, ri) => {
-            const isAuto = ci === AUTO_CI && ri === AUTO_RI;
+            const isAuto = AUTO_CELLS.has(`${ci}-${ri}`);
             return (
-              <div key={ri}>
-                <div className="ratio-row">
+              <div className="ratio-row" key={ri}>
+                <input
+                  className="ratio-formula"
+                  type="text"
+                  value={row.formula}
+                  onChange={(e) => update(ci, ri, "formula", e.target.value)}
+                  placeholder="式"
+                />
+                <div className="ratio-score-box">
                   <input
-                    className="ratio-formula"
+                    className="ratio-score"
                     type="text"
-                    value={row.formula}
-                    onChange={(e) => update(ci, ri, "formula", e.target.value)}
-                    placeholder="式"
+                    inputMode="numeric"
+                    value={row.score}
+                    onChange={(e) => update(ci, ri, "score", e.target.value)}
+                    placeholder="点数"
+                    readOnly={isAuto}
                   />
-                  <div className="ratio-score-box">
-                    <input
-                      className="ratio-score"
-                      type="text"
-                      inputMode="numeric"
-                      value={row.score}
-                      onChange={(e) => update(ci, ri, "score", e.target.value)}
-                      placeholder="点数"
-                      readOnly={isAuto}
-                    />
-                    <span className="finput-unit">点</span>
-                  </div>
+                  <span className="finput-unit">点</span>
                 </div>
               </div>
             );
