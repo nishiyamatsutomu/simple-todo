@@ -15,10 +15,13 @@ const STORAGE_KEY = "app:credit-ratios-v8";
 const FIN_KEY = "app:financial-inputs-v3";
 const IDX_URIAGE_SORI = 0; // 売上総利益
 const IDX_KEIJO = 1; // 経常利益
+const IDX_JINKENHI = 2; // 人件費（総額）
 const IDX_HANKANHI = 3; // 販売管理費
 const IDX_GENYOKIN = 4; // 現預金
 const IDX_JIKOSHIHON = 5; // 自己資本
 const IDX_SOSHISAN = 6; // 総資産
+const IDX_JUGYOIN = 7; // 従業員数
+const IDX_SHIKINGURI = 8; // 資金繰り表作成（あり／なし）
 
 type Row = { formula: string; score: string };
 
@@ -41,7 +44,7 @@ function emptyData(): Row[][] {
 }
 
 // 自動計算するセル
-const AUTO_CELLS = new Set(["0-0", "0-1", "1-0"]);
+const AUTO_CELLS = new Set(["0-0", "0-1", "1-0", "1-1", "2-0", "2-1", "3-0"]);
 
 export default function CreditRatios() {
   const [data, setData] = useState<Row[][]>(emptyData);
@@ -131,10 +134,69 @@ export default function CreditRatios() {
       ? 5
       : 0;
 
+  // 生産性2項目め（人件費比率）：人件費 ÷ 売上総利益 × 100
+  const jinken = num(IDX_JINKENHI);
+  const ratio4 =
+    jinken !== null && sori !== null && sori !== 0
+      ? (jinken / sori) * 100
+      : null;
+  const score4 =
+    ratio4 === null
+      ? null
+      : ratio4 <= 40
+      ? 15
+      : ratio4 < 50
+      ? 10
+      : ratio4 < 60
+      ? 5
+      : 0;
+
+  // 収益性2項目め：経常利益 ÷ 自己資本 × 100
+  const jiko2 = num(IDX_JIKOSHIHON);
+  const ratio5 =
+    keijo !== null && jiko2 !== null && jiko2 !== 0
+      ? (keijo / jiko2) * 100
+      : null;
+  const score5 =
+    ratio5 === null
+      ? null
+      : ratio5 >= 7
+      ? 15
+      : ratio5 >= 4
+      ? 10
+      : ratio5 > 0
+      ? 5
+      : 0;
+
+  // 生産性1項目め：売上総利益 ÷ 従業員数（1人あたり付加価値）
+  // 売上総利益の入力は「千円」単位。しきい値は万円なので千円に直す
+  // （1000万=10000千円、600万=6000千円、400万=4000千円）
+  const jugyoin = num(IDX_JUGYOIN);
+  const perEmployee =
+    sori !== null && jugyoin !== null && jugyoin !== 0 ? sori / jugyoin : null;
+  const score6 =
+    perEmployee === null
+      ? null
+      : perEmployee >= 10000
+      ? 15
+      : perEmployee >= 6000
+      ? 10
+      : perEmployee > 4000
+      ? 5
+      : 0;
+
+  // 資金繰り表：あり → 10点、なし → 0点（未選択は空欄）
+  const shikin = fin[IDX_SHIKINGURI] ?? "";
+  const score7 = shikin === "あり" ? 10 : shikin === "なし" ? 0 : null;
+
   const autoScores: Record<string, number | null> = {
     "0-0": score1,
     "0-1": score2,
     "1-0": score3,
+    "1-1": score5,
+    "2-0": score6,
+    "2-1": score4,
+    "3-0": score7,
   };
 
   // 計算結果を点数に反映（同じ値なら更新せずループを防ぐ）
@@ -159,7 +221,7 @@ export default function CreditRatios() {
       return changed ? next : prev;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loaded, score1, score2, score3]);
+  }, [loaded, score1, score2, score3, score4, score5, score6, score7]);
 
   // 変更のたびに保存
   useEffect(() => {
