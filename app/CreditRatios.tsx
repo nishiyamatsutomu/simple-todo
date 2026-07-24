@@ -259,7 +259,7 @@ export default function CreditRatios() {
   );
 
   return (
-    <section className="card">
+    <section className="card card-plain">
       <p className="section-lead">
         安定性・収益性・生産性・資金繰り表について、式と点数を入力してください。
       </p>
@@ -271,9 +271,9 @@ export default function CreditRatios() {
             const isAuto = AUTO_CELLS.has(`${ci}-${ri}`);
             return (
               <div className="ratio-row" key={ri}>
-                <input
+                <textarea
                   className="ratio-formula"
-                  type="text"
+                  rows={2}
                   value={row.formula}
                   onChange={(e) => update(ci, ri, "formula", e.target.value)}
                   placeholder="式"

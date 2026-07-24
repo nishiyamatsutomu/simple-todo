@@ -57,7 +57,7 @@ export default function Checklist({
   const allChecked = missingItems.length === 0;
 
   return (
-    <section className="card">
+    <section className="card card-plain">
       <ul className="list">
         {defaultItems.map((item, i) => (
           <li key={i} className={`item${checked[i] ? " done" : ""}`}>

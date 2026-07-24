@@ -57,7 +57,7 @@ export default function FinancialInputs() {
   };
 
   return (
-    <section className="card">
+    <section className="card card-plain">
       <p className="section-lead">
         決算書を見ながら、下の欄に入力してください。
       </p>

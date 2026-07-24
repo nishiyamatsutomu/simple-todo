@@ -30,7 +30,7 @@ const TITLES: Record<
   { title: string; lead?: string; subtitle?: string[]; note?: string[] }
 > = {
   1: {
-    title: "① 申込前チェック",
+    title: "① 与信判断前チェック",
     subtitle: ["次の10項目に当てはまればチェックをいれて下さい"],
   },
   2: {
@@ -119,7 +119,7 @@ export default function AppTabs() {
           onClick={() => setTab(1)}
         >
           <span className="tabbtn-icon">✅</span>
-          <span className="tabbtn-label">申込前</span>
+          <span className="tabbtn-label">与信判断前</span>
         </button>
         <button
           className={`tabbtn${tab === 2 ? " active" : ""}`}

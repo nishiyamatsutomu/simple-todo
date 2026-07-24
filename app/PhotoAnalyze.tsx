@@ -19,7 +19,7 @@ export default function PhotoAnalyze() {
   };
 
   return (
-    <section className="card">
+    <section className="card card-plain">
       <p className="section-lead">
         決算書を撮影すると、ここに表示されます。
         <br />

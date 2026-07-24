@@ -1,6 +1,7 @@
 :root {
   --bg: #f4f5f7;
   --card: #ffffff;
+  --card-pink: #fdeff3;
   --text: #1f2933;
   --muted: #9aa5b1;
   --border: #e4e7eb;
@@ -91,10 +92,15 @@ body {
 }
 
 .card {
-  background: var(--card);
+  background: var(--card-pink);
   border-radius: 18px;
   box-shadow: var(--shadow);
   padding: 24px;
+}
+
+/* チェックリストの外枠は白（中の10個の枠をピンクで目立たせる） */
+.card.card-plain {
+  background: var(--card);
 }
 
 .input-row {
@@ -160,11 +166,12 @@ body {
   padding: 14px 16px;
   border: 1px solid var(--border);
   border-radius: 12px;
+  background: var(--card-pink);
   transition: background 0.15s;
 }
 
 .item:hover {
-  background: #fafbfc;
+  background: #fbe4ec;
 }
 
 .checkbox {
@@ -174,6 +181,7 @@ body {
   flex-shrink: 0;
   border: 2px solid var(--border);
   border-radius: 7px;
+  background: var(--card);
   cursor: pointer;
   position: relative;
   transition: border-color 0.15s, background 0.15s;
@@ -520,6 +528,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 10px;
   outline: none;
+  background: var(--card-pink);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
@@ -546,7 +555,7 @@ body {
   font-weight: 500;
   font-family: inherit;
   color: var(--text);
-  background: #fff;
+  background: var(--card-pink);
   border: 1px solid var(--border);
   border-radius: 10px;
   cursor: pointer;
@@ -554,7 +563,7 @@ body {
 }
 
 .yesno-btn:hover {
-  background: #f4f5f7;
+  background: #fbe4ec;
 }
 
 .yesno-btn.selected {
@@ -697,13 +706,19 @@ body {
 .ratio-formula {
   flex: 1;
   min-width: 0;
-  padding: 10px 12px;
-  font-size: 14px;
+  padding: 8px 12px;
+  font-size: 13px;
+  line-height: 1.45;
   font-family: inherit;
   border: 1px solid var(--border);
   border-radius: 10px;
   outline: none;
+  background: var(--card-pink);
   transition: border-color 0.15s, box-shadow 0.15s;
+  resize: none;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .ratio-score-box {
@@ -719,9 +734,10 @@ body {
   font-size: 14px;
   font-family: inherit;
   text-align: right;
-  border: 1px solid var(--border);
+  border: 2px solid var(--text);
   border-radius: 10px;
   outline: none;
+  background: var(--card);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
@@ -751,8 +767,9 @@ body {
 .ratio-criteria {
   margin-top: 14px;
   padding: 14px 16px;
-  border: 2px solid var(--text);
+  border: 2px solid var(--accent);
   border-radius: 12px;
+  background: var(--accent);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -761,7 +778,7 @@ body {
 .ratio-criteria p {
   font-size: 17px;
   font-weight: 700;
-  color: #000;
+  color: #fff;
 }
 
 .ratio-criteria-title {
