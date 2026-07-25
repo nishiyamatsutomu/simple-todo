@@ -1,0 +1,319 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+// 各項目と、その中の行数
+const CATEGORIES: { name: string; rows: number }[] = [
+  { name: "安定性", rows: 2 },
+  { name: "収益性", rows: 2 },
+  { name: "生産性", rows: 2 },
+  { name: "資金繰り表", rows: 1 },
+];
+
+const STORAGE_KEY = "app:credit-ratios-v8";
+// 2ページ目の数字入力のならび
+const FIN_KEY = "app:financial-inputs-v3";
+const IDX_URIAGE_SORI = 0; // 売上総利益
+const IDX_KEIJO = 1; // 経常利益
+const IDX_JINKENHI = 2; // 人件費（総額）
+const IDX_HANKANHI = 3; // 販売管理費
+const IDX_GENYOKIN = 4; // 現預金
+const IDX_JIKOSHIHON = 5; // 自己資本
+const IDX_SOSHISAN = 6; // 総資産
+const IDX_JUGYOIN = 7; // 従業員数
+const IDX_SHIKINGURI = 8; // 資金繰り表作成（あり／なし）
+
+type Row = { formula: string; score: string };
+
+function emptyData(): Row[][] {
+  const data = CATEGORIES.map((c) =>
+    Array.from({ length: c.rows }, () => ({ formula: "", score: "" }))
+  );
+  // 安定性
+  data[0][0].formula = "今までの積み重ね自己資本比率";
+  data[0][1].formula = "売上不振・不況になっても耐えうる余力";
+  // 収益性
+  data[1][0].formula = "業種を問わず売上総利益から判定";
+  data[1][1].formula = "M＆Aでも使われる経常利益/自己資本比率";
+  // 生産性
+  data[2][0].formula = "従業員1名当たりの貢献度から判定";
+  data[2][1].formula = "再チェック人件費比率";
+  // 資金繰り表
+  data[3][0].formula = "有無";
+  return data;
+}
+
+// 自動計算するセル
+const AUTO_CELLS = new Set(["0-0", "0-1", "1-0", "1-1", "2-0", "2-1", "3-0"]);
+
+export default function CreditRatios() {
+  const [data, setData] = useState<Row[][]>(emptyData);
+  const [loaded, setLoaded] = useState(false);
+  const [fin, setFin] = useState<string[]>([]);
+
+  // 初回に localStorage から読み込む
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const arr = JSON.parse(saved);
+        if (
+          Array.isArray(arr) &&
+          arr.length === CATEGORIES.length &&
+          arr.every(
+            (rows, i) => Array.isArray(rows) && rows.length === CATEGORIES[i].rows
+          )
+        ) {
+          setData(arr);
+        }
+      }
+    } catch {
+      // 破損データは無視
+    }
+    // 2ページ目の数字も読み込む
+    try {
+      const s = localStorage.getItem(FIN_KEY);
+      if (s) {
+        const a = JSON.parse(s);
+        if (Array.isArray(a)) setFin(a);
+      }
+    } catch {
+      // 無視
+    }
+    setLoaded(true);
+  }, []);
+
+  const num = (i: number) => {
+    const n = parseFloat(fin[i] ?? "");
+    return Number.isFinite(n) ? n : null;
+  };
+
+  // 安定性1項目め：自己資本 ÷ 総資産 × 100
+  const jiko = num(IDX_JIKOSHIHON);
+  const so = num(IDX_SOSHISAN);
+  const ratio1 = jiko !== null && so !== null && so !== 0 ? (jiko / so) * 100 : null;
+  const score1 =
+    ratio1 === null
+      ? null
+      : ratio1 >= 50
+      ? 15
+      : ratio1 >= 30
+      ? 10
+      : ratio1 >= 10
+      ? 5
+      : 0;
+
+  // 安定性2項目め：現預金 ÷ 販管費 × 12
+  const gen = num(IDX_GENYOKIN);
+  const han = num(IDX_HANKANHI);
+  const ratio2 = gen !== null && han !== null && han !== 0 ? (gen / han) * 12 : null;
+  const score2 =
+    ratio2 === null
+      ? null
+      : ratio2 >= 5
+      ? 15
+      : ratio2 >= 3
+      ? 10
+      : ratio2 > 1
+      ? 5
+      : 0;
+
+  // 収益性1項目め：経常利益 ÷ 売上総利益 × 100
+  const keijo = num(IDX_KEIJO);
+  const sori = num(IDX_URIAGE_SORI);
+  const ratio3 =
+    keijo !== null && sori !== null && sori !== 0 ? (keijo / sori) * 100 : null;
+  const score3 =
+    ratio3 === null
+      ? null
+      : ratio3 >= 20
+      ? 15
+      : ratio3 >= 10
+      ? 10
+      : ratio3 >= 0
+      ? 5
+      : 0;
+
+  // 生産性2項目め（人件費比率）：人件費 ÷ 売上総利益 × 100
+  const jinken = num(IDX_JINKENHI);
+  const ratio4 =
+    jinken !== null && sori !== null && sori !== 0
+      ? (jinken / sori) * 100
+      : null;
+  const score4 =
+    ratio4 === null
+      ? null
+      : ratio4 <= 40
+      ? 15
+      : ratio4 < 50
+      ? 10
+      : ratio4 < 60
+      ? 5
+      : 0;
+
+  // 収益性2項目め：経常利益 ÷ 自己資本 × 100
+  const jiko2 = num(IDX_JIKOSHIHON);
+  const ratio5 =
+    keijo !== null && jiko2 !== null && jiko2 !== 0
+      ? (keijo / jiko2) * 100
+      : null;
+  const score5 =
+    ratio5 === null
+      ? null
+      : ratio5 >= 7
+      ? 15
+      : ratio5 >= 4
+      ? 10
+      : ratio5 > 0
+      ? 5
+      : 0;
+
+  // 生産性1項目め：売上総利益 ÷ 従業員数（1人あたり付加価値）
+  // 売上総利益の入力は「千円」単位。しきい値は万円なので千円に直す
+  // （1000万=10000千円、600万=6000千円、400万=4000千円）
+  const jugyoin = num(IDX_JUGYOIN);
+  const perEmployee =
+    sori !== null && jugyoin !== null && jugyoin !== 0 ? sori / jugyoin : null;
+  const score6 =
+    perEmployee === null
+      ? null
+      : perEmployee >= 10000
+      ? 15
+      : perEmployee >= 6000
+      ? 10
+      : perEmployee > 4000
+      ? 5
+      : 0;
+
+  // 資金繰り表：あり → 10点、なし → 0点（未選択は空欄）
+  const shikin = fin[IDX_SHIKINGURI] ?? "";
+  const score7 = shikin === "あり" ? 10 : shikin === "なし" ? 0 : null;
+
+  const autoScores: Record<string, number | null> = {
+    "0-0": score1,
+    "0-1": score2,
+    "1-0": score3,
+    "1-1": score5,
+    "2-0": score6,
+    "2-1": score4,
+    "3-0": score7,
+  };
+
+  // 計算結果を点数に反映（同じ値なら更新せずループを防ぐ）
+  useEffect(() => {
+    if (!loaded) return;
+    setData((prev) => {
+      let changed = false;
+      const next = prev.map((rows, i) =>
+        rows.map((row, j) => {
+          const key = `${i}-${j}`;
+          if (key in autoScores) {
+            const sc = autoScores[key];
+            const desired = sc === null ? "" : String(sc);
+            if (row.score !== desired) {
+              changed = true;
+              return { ...row, score: desired };
+            }
+          }
+          return row;
+        })
+      );
+      return changed ? next : prev;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded, score1, score2, score3, score4, score5, score6, score7]);
+
+  // 変更のたびに保存
+  useEffect(() => {
+    if (loaded) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+  }, [data, loaded]);
+
+  const update = (
+    ci: number,
+    ri: number,
+    field: "formula" | "score",
+    value: string
+  ) => {
+    setData((prev) =>
+      prev.map((rows, i) =>
+        i !== ci
+          ? rows
+          : rows.map((row, j) => (j !== ri ? row : { ...row, [field]: value }))
+      )
+    );
+  };
+
+  const clearAll = () => setData(emptyData());
+
+  // 点数の合計（数字として読めるものだけ足す）
+  const total = data.reduce(
+    (sum, rows) =>
+      sum +
+      rows.reduce((s, row) => {
+        const n = parseFloat(row.score);
+        return s + (Number.isFinite(n) ? n : 0);
+      }, 0),
+    0
+  );
+
+  return (
+    <section className="card card-plain">
+      <p className="section-lead">
+        安定性・収益性・生産性・資金繰り表について、式と点数を入力してください。
+      </p>
+
+      {CATEGORIES.map((cat, ci) => (
+        <div className="ratio-group" key={ci}>
+          <h3 className="ratio-cat">{cat.name}</h3>
+          {data[ci].map((row, ri) => {
+            const isAuto = AUTO_CELLS.has(`${ci}-${ri}`);
+            return (
+              <div className="ratio-row" key={ri}>
+                <textarea
+                  className="ratio-formula"
+                  rows={2}
+                  value={row.formula}
+                  onChange={(e) => update(ci, ri, "formula", e.target.value)}
+                  placeholder="式"
+                />
+                <div className="ratio-score-box">
+                  <input
+                    className="ratio-score"
+                    type="text"
+                    inputMode="numeric"
+                    value={row.score}
+                    onChange={(e) => update(ci, ri, "score", e.target.value)}
+                    placeholder="点数"
+                    readOnly={isAuto}
+                  />
+                  <span className="finput-unit">点</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ))}
+
+      <div className="ratio-total">
+        <span className="ratio-total-label">合計点数</span>
+        <span className="ratio-total-value">{total} 点</span>
+      </div>
+
+      <div className="ratio-criteria">
+        <p className="ratio-criteria-title">判定基準</p>
+        <p>70点以上　　高い財務健全性</p>
+        <p>40点〜69点　財務健全標準</p>
+        <p>40点以下　　注意を要する</p>
+      </div>
+
+      <div className="checklist-footer">
+        <span className="footer">入力は自動で保存されます</span>
+        <button className="reset-btn" onClick={clearAll}>
+          クリア
+        </button>
+      </div>
+    </section>
+  );
+}

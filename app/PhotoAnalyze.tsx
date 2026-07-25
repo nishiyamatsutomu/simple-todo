@@ -19,7 +19,7 @@ export default function PhotoAnalyze() {
   };
 
   return (
-    <section className="card">
+    <section className="card card-plain">
       <p className="section-lead">
         決算書を撮影すると、ここに表示されます。
         <br />
@@ -58,6 +58,13 @@ export default function PhotoAnalyze() {
           </button>
         </div>
       )}
+
+      <div className="photo-hint">
+        <p>
+          ジェミニなどに画像を添付して「財務分析」と入力すれば、分析してもらえます。
+        </p>
+        <p>但し、一般的でポジティブなコメントになります。</p>
+      </div>
     </section>
   );
 }

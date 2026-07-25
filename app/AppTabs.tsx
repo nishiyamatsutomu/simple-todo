@@ -3,6 +3,9 @@
 import { useState } from "react";
 import Checklist from "./Checklist";
 import PhotoAnalyze from "./PhotoAnalyze";
+import FinancialInputs from "./FinancialInputs";
+import CreditRatios from "./CreditRatios";
+import ContactForm from "./ContactForm";
 
 // ▼ 1ページ目：取引前チェック
 const PAGE1_ITEMS = [
@@ -18,46 +21,96 @@ const PAGE1_ITEMS = [
   "悪質な紹介者に多大な手数料を支払っていない",
 ];
 
-// ▼ 3ページ目：与信判断チェック（サンプル。あとで本物に差しかえOK）
-const CREDIT_ITEMS = [
-  "売上は安定して伸びているか",
-  "利益（黒字）が出ているか",
-  "自己資本比率は十分か",
-  "借入が多すぎないか",
-  "現金・預金は十分にあるか",
-  "支払い遅れの情報はないか",
-  "取引限度額を決めたか",
-  "担保・保証はあるか",
-  "業界全体の景気は悪くないか",
-  "総合的に取引してよいと判断できるか",
-];
-
 type Tab = 1 | 2 | 3;
 
-const TITLES: Record<Tab, { title: string; subtitle: string }> = {
-  1: { title: "① 取引前チェック", subtitle: "取引をはじめる前の基本の確認" },
-  2: { title: "② 決算書 撮影・分析", subtitle: "決算書を撮って企業を分析" },
-  3: { title: "③ 与信判断チェック", subtitle: "取引してよいかの最終判断" },
+const APP_TITLE = "あなたの会社分析";
+
+const TITLES: Record<
+  Tab,
+  { title: string; lead?: string; subtitle?: string[]; note?: string[] }
+> = {
+  1: {
+    title: "① 与信判断前チェック",
+    subtitle: ["次の10項目に当てはまればチェックをいれて下さい"],
+  },
+  2: {
+    title: "② 決算書 撮影・分析",
+    note: [
+      "1つでもチェックがない場合は改善してください",
+      "金融公庫や保証付き融資の与信判断に影響する場合があります",
+    ],
+    subtitle: [
+      "次にあなたの会社の財務分析をします",
+      "決算書・貸借対照表・損益計算書の写真を撮って画像を添付してください",
+      "会社名や取引先がわかるものは消してください",
+    ],
+  },
+  3: {
+    title: "③ 与信判断チェック",
+    lead: "比率分析からの判断",
+    subtitle: [
+      "企業の安定性・収益性・生産性についての与信判断です。",
+      "業種・業界の成長性については加味していません。",
+    ],
+  },
 };
 
 export default function AppTabs() {
   const [tab, setTab] = useState<Tab>(1);
+  const { title, lead, subtitle, note } = TITLES[tab];
 
   return (
     <>
       <header className="header">
-        <h1 className="title">{TITLES[tab].title}</h1>
-        <p className="subtitle">{TITLES[tab].subtitle}</p>
+        <p className="app-title">{APP_TITLE}</p>
+        {note && (
+          <div className="header-note">
+            {note.map((line, i) => (
+              <p key={i}>{line}</p>
+            ))}
+          </div>
+        )}
+        <h1 className="title">{title}</h1>
+        {lead && <p className="page-lead">{lead}</p>}
+        {subtitle && (
+          <div className="subtitle">
+            {subtitle.map((line, i) => (
+              <p key={i}>{line}</p>
+            ))}
+          </div>
+        )}
       </header>
 
       <div className="tab-content">
         {tab === 1 && (
-          <Checklist storageKey="app:check-page1-v2" defaultItems={PAGE1_ITEMS} />
+          <>
+            <ContactForm />
+            <Checklist storageKey="app:check-page1-v2" defaultItems={PAGE1_ITEMS} />
+            <div className="page1-footer">
+              <p>文責はクラフトマンシップ(株)</p>
+              <p>次回は資金繰りアプリお楽しみに</p>
+            </div>
+          </>
         )}
-        {tab === 2 && <PhotoAnalyze />}
-        {tab === 3 && (
-          <Checklist storageKey="app:check-credit" defaultItems={CREDIT_ITEMS} />
+        {tab === 2 && (
+          <>
+            <PhotoAnalyze />
+            <section className="card promo-card">
+              <p className="promo-line">相続は信頼</p>
+              <p className="promo-line">経営はコントロール</p>
+              <p className="promo-line">税務・経理はその基礎</p>
+              <p className="promo-address">奈良県橿原市小綱町八番17-1号</p>
+              <p className="promo-office">西山正彦税理士事務所</p>
+              <p className="promo-name">代表　西山正彦</p>
+              <p className="promo-tel">☎0744-48-3727</p>
+            </section>
+            <FinancialInputs />
+            <button className="next-page-btn" onClick={() => setTab(3)}>
+              判定は次のページで →
+            </button>
+          </>
         )}
+        {tab === 3 && <CreditRatios />}
       </div>
 
       <nav className="tabbar">
@@ -66,7 +119,7 @@ export default function AppTabs() {
           onClick={() => setTab(1)}
         >
           <span className="tabbtn-icon">✅</span>
-          <span className="tabbtn-label">取引前</span>
+          <span className="tabbtn-label">与信判断前</span>
         </button>
         <button
           className={`tabbtn${tab === 2 ? " active" : ""}`}
